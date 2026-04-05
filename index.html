@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poker Study Solver | Early Edition</title>
+    <title>Poker Study Solver | Pro Edition</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header class="topbar">
         <h1>Poker Study <span class="accent">Solver</span></h1>
-        <div class="status-badge">Engine: Offline</div>
+        <div class="status-badge">Engine: Online</div>
     </header>
 
     <main class="dashboard">
@@ -57,20 +57,8 @@
                 <input type="number" id="villain-bet" placeholder="Ex: 5" step="0.1">
             </div>
             
-            <button class="btn-primary" id="btn-calculate">Calcular EV</button>
+            <button class="btn-primary" id="btn-calculate" disabled>Calcular EV</button>
         </section>
-            <div id="matrix-container" class="matrix-wrapper hidden">
-                <div class="matrix-header">
-                    <h3>Editor de Range <span id="matrix-target-label">- Villain</span></h3>
-                    <button id="btn-close-matrix" class="btn-close">X</button>
-                </div>
-                <div id="hand-matrix" class="hand-matrix">
-                    </div>
-                <div class="matrix-controls">
-                    <button id="btn-clear-matrix" class="btn-secondary">Limpar Range</button>
-                    <button id="btn-apply-position" class="btn-secondary">Aplicar Padrão da Posição</button>
-                </div>
-            </div>
 
         <section class="panel cards-panel">
             <h2>Mesa e Ranges</h2>
@@ -106,6 +94,19 @@
 
             <div id="deck-container" class="deck-container hidden">
                 </div>
+
+            <div id="matrix-container" class="matrix-wrapper hidden">
+                <div class="matrix-header">
+                    <h3>Editor de Range <span id="matrix-target-label">- Villain</span></h3>
+                    <button id="btn-close-matrix" class="btn-close">X</button>
+                </div>
+                <div id="hand-matrix" class="hand-matrix">
+                    </div>
+                <div class="matrix-controls">
+                    <button id="btn-clear-matrix" class="btn-secondary">Limpar Range</button>
+                    <button id="btn-apply-position" class="btn-secondary">Aplicar Padrão da Posição</button>
+                </div>
+            </div>
         </section>
 
         <section class="panel results-panel">
@@ -129,7 +130,7 @@
             </div>
         </section>
     </main>
+
     <script type="module" src="js/main.js"></script>
-</body>
 </body>
 </html>
