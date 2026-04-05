@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Study Solver | Early Edition</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="topbar">
+        <h1>Poker Study <span class="accent">Solver</span></h1>
+        <div class="status-badge">Engine: Offline</div>
+    </header>
+
+    <main class="dashboard">
+        <section class="panel inputs-panel">
+            <h2>Parâmetros da Mão</h2>
+            
+            <div class="input-group">
+                <label for="hero-position">Posição do Hero</label>
+                <select id="hero-position" class="custom-select">
+                    <option value="utg">UTG (Early Position)</option>
+                    <option value="mp">MP (Middle Position)</option>
+                    <option value="co">Cutoff</option>
+                    <option value="btn">Button</option>
+                    <option value="sb">Small Blind</option>
+                    <option value="bb">Big Blind</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="villain-position">Posição do Villain</label>
+                <select id="villain-position" class="custom-select">
+                    <option value="bb">Big Blind (Defesa)</option>
+                    <option value="utg">UTG</option>
+                    <option value="mp">MP</option>
+                    <option value="co">Cutoff</option>
+                    <option value="btn">Button</option>
+                    <option value="sb">Small Blind</option>
+                </select>
+            </div>
+
+            <button class="btn-secondary" id="btn-open-matrix">Visualizar Range (13x13)</button>
+
+            <div class="input-group" style="margin-top: 1rem;">
+                <label for="pot-size">Tamanho do Pote (BB)</label>
+                <input type="number" id="pot-size" placeholder="Ex: 10.5" step="0.1">
+            </div>
+
+            <div class="input-group">
+                <label for="hero-bet">Aposta do Hero (BB)</label>
+                <input type="number" id="hero-bet" placeholder="Ex: 5" step="0.1">
+            </div>
+
+            <div class="input-group">
+                <label for="villain-bet">Aposta do Villain (BB)</label>
+                <input type="number" id="villain-bet" placeholder="Ex: 5" step="0.1">
+            </div>
+            
+            <button class="btn-primary" id="btn-calculate">Calcular EV</button>
+        </section>
+            <div id="matrix-container" class="matrix-wrapper hidden">
+                <div class="matrix-header">
+                    <h3>Editor de Range <span id="matrix-target-label">- Villain</span></h3>
+                    <button id="btn-close-matrix" class="btn-close">X</button>
+                </div>
+                <div id="hand-matrix" class="hand-matrix">
+                    </div>
+                <div class="matrix-controls">
+                    <button id="btn-clear-matrix" class="btn-secondary">Limpar Range</button>
+                    <button id="btn-apply-position" class="btn-secondary">Aplicar Padrão da Posição</button>
+                </div>
+            </div>
+
+        <section class="panel cards-panel">
+            <h2>Mesa e Ranges</h2>
+            
+            <div class="table-layout">
+                <div class="hand-group hero-group">
+                    <h3>Hero</h3>
+                    <div class="card-slots" id="hero-slots">
+                        <div class="card-slot empty" data-owner="hero" data-index="0"></div>
+                        <div class="card-slot empty" data-owner="hero" data-index="1"></div>
+                    </div>
+                </div>
+
+                <div class="hand-group board-group">
+                    <h3>Board</h3>
+                    <div class="card-slots board-slots" id="board-slots">
+                        <div class="card-slot empty flop" data-owner="board" data-index="0"></div>
+                        <div class="card-slot empty flop" data-owner="board" data-index="1"></div>
+                        <div class="card-slot empty flop" data-owner="board" data-index="2"></div>
+                        <div class="card-slot empty turn" data-owner="board" data-index="3"></div>
+                        <div class="card-slot empty river" data-owner="board" data-index="4"></div>
+                    </div>
+                </div>
+
+                <div class="hand-group villain-group">
+                    <h3>Villain</h3>
+                    <div class="card-slots" id="villain-slots">
+                        <div class="card-slot empty" data-owner="villain" data-index="0"></div>
+                        <div class="card-slot empty" data-owner="villain" data-index="1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="deck-container" class="deck-container hidden">
+                </div>
+        </section>
+
+        <section class="panel results-panel">
+            <h2>Análise Monte Carlo</h2>
+            
+            <div class="result-box">
+                <span class="result-label">Hero Equity</span>
+                <span class="result-value" id="res-equity">--%</span>
+            </div>
+
+            <div class="result-box highlight">
+                <span class="result-label">Expected Value (EV)</span>
+                <span class="result-value" id="res-ev">--</span>
+            </div>
+
+            <div class="stats-footer">
+                <p>Iterações: <span id="mc-iterations">0</span> / 10.000</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="mc-progress"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script type="module" src="js/main.js"></script>
+</body>
+</body>
+</html>

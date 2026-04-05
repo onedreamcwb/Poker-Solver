@@ -1,0 +1,426 @@
+/* Variáveis Globais: Dark Mode & Clean Tech */
+:root {
+    --bg-base: #121212;
+    --bg-panel: #1e1e1e;
+    --bg-input: #2a2a2a;
+    --text-main: #e0e0e0;
+    --text-muted: #888888;
+    --accent-color: #00ff88;
+    --accent-glow: rgba(0, 255, 136, 0.2);
+    --border-color: #333333;
+    --danger-color: #ff4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: var(--bg-base);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+/* Seletor de Posição */
+.custom-select {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.8rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+}
+
+.custom-select:focus {
+    border-color: var(--accent-color);
+}
+
+/* Header */
+.topbar {
+    padding: 1.5rem 2rem;
+    background-color: var(--bg-panel);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topbar h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.topbar .accent {
+    color: var(--accent-color);
+}
+
+.status-badge {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    background: var(--bg-input);
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+/* Layout Principal: CSS Grid */
+.dashboard {
+    display: grid;
+    grid-template-columns: 250px 1fr 300px;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    flex: 1;
+}
+
+/* Painéis Comuns */
+.panel {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.panel h2 {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.8rem;
+}
+
+/* Inputs */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.input-group input {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.8rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-group input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Botões */
+.btn-primary {
+    background-color: var(--accent-color);
+    color: #000;
+    border: none;
+    padding: 1rem;
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    margin-top: auto;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #00cc6a;
+}
+
+.btn-primary:disabled {
+    background-color: var(--bg-input);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+/* Mesa e Cartas */
+.table-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.hand-group {
+    text-align: center;
+}
+
+.hand-group h3 {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.8rem;
+}
+
+.card-slots {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.board-slots {
+    gap: 1rem;
+}
+
+.card-slot {
+    width: 60px;
+    height: 85px;
+    background-color: var(--bg-input);
+    border: 2px dashed var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.card-slot:hover {
+    border-color: var(--accent-color);
+    background-color: rgba(0, 255, 136, 0.05);
+}
+
+/* Resultados */
+.result-box {
+    background-color: var(--bg-input);
+    border-radius: 6px;
+    padding: 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.result-box.highlight {
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.result-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.result-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+.highlight .result-value {
+    color: var(--accent-color);
+}
+
+/* Barra de Progresso Monte Carlo */
+.stats-footer {
+    margin-top: auto;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background-color: var(--bg-input);
+    border-radius: 3px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%; /* Alterado via JS */
+    background-color: var(--accent-color);
+    transition: width 0.1s linear;
+}
+
+/* Responsividade Básica */
+@media (max-width: 1024px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+}
+/* =========================================
+   FASE 2: Estilos Dinâmicos e Seletor (Deck)
+   ========================================= */
+
+.deck-container {
+    display: grid;
+    /* 13 colunas para alinhar perfeitamente 2 ao Ás */
+    grid-template-columns: repeat(13, 1fr);
+    gap: 0.4rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.deck-container.hidden {
+    display: none;
+}
+
+.deck-card {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.5rem 0;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.deck-card:hover:not(.disabled) {
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* Cores dos Naipes */
+.deck-card.red, .card-slot.filled.red {
+    color: var(--danger-color);
+}
+
+.deck-card.black, .card-slot.filled.black {
+    color: var(--text-main);
+}
+
+/* Estados Dinâmicos */
+.deck-card.disabled {
+    opacity: 0.15;
+    pointer-events: none;
+    background-color: #000;
+}
+
+.card-slot.active-slot {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 12px var(--accent-glow);
+    background-color: rgba(0, 255, 136, 0.05);
+    transform: scale(1.05);
+}
+
+.card-slot.filled {
+    border-style: solid;
+    background-color: var(--bg-input);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    line-height: 1.2;
+    cursor: pointer; /* Indica que pode clicar para remover */
+}
+
+.card-slot.filled:hover {
+    border-color: var(--danger-color); /* Hover de remoção */
+    background-color: rgba(255, 68, 68, 0.1);
+}
+
+
+/* Botões Secundários 
+FASE 4 */
+.btn-secondary {
+    background-color: transparent;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    padding: 0.6rem;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: var(--accent-glow);
+}
+
+/* Modal / Wrapper da Matriz 13x13 */
+.matrix-wrapper {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 2rem;
+}
+
+.matrix-wrapper.hidden {
+    display: none;
+}
+
+.matrix-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.btn-close:hover { color: var(--danger-color); }
+
+/* O Grid de 169 Mãos */
+.hand-matrix {
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    gap: 2px;
+}
+
+.matrix-cell {
+    background-color: var(--bg-input);
+    color: var(--text-muted);
+    aspect-ratio: 1; /* Mantém quadrados perfeitos */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.1s, color 0.1s;
+}
+
+.matrix-cell:hover {
+    border: 1px solid var(--accent-color);
+}
+
+/* Tipos de Mãos */
+.matrix-cell.pair { border-bottom: 2px solid #aaa; }
+.matrix-cell.suited { color: #88c0d0; } /* Azul suave para Suited */
+.matrix-cell.offsuit { color: #bf616a; } /* Vermelho suave para Offsuit */
+
+/* Estado Selecionado */
+.matrix-cell.selected {
+    background-color: var(--accent-color);
+    color: #000;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+}
+
+.matrix-controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
