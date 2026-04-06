@@ -3,82 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poker RFI Trainer | Pro Edition</title>
+    <title>Poker GTO Academy | Pro Edition</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header class="topbar">
-        <h1>Poker RFI <span class="accent">Trainer</span></h1>
-        <div class="status-badge">Mode: Pre-Flop Drill</div>
-    </header>
-
-    <main class="dashboard">
-        <section class="panel inputs-panel">
-            <h2>Configuração</h2>
-            
-            <div class="input-group">
-                <label for="train-position">Treinar Posição</label>
-                <select id="train-position" class="custom-select">
-                    <option value="utg">UTG (Early Position)</option>
-                    <option value="mp">MP (Middle Position)</option>
-                    <option value="co">Cutoff</option>
-                    <option value="btn">Button</option>
-                    <option value="sb">Small Blind</option>
-                </select>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>GTO <span class="accent">Academy</span></h2>
             </div>
-
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem;">
-                Todas as mãos simulam que a ação rodou em FOLD até você.
-            </p>
-
-            <button class="btn-primary" id="btn-start-training" style="margin-top: 2rem;">Iniciar Sessão</button>
-            <button class="btn-secondary" id="btn-stop-training" style="display: none; margin-top: 0.5rem;">Parar Sessão</button>
-        </section>
-
-        <section class="panel cards-panel">
-            <h2>Mesa</h2>
             
-            <div class="table-layout">
-                <div class="hand-group hero-group">
-                    <h3 id="scenario-text" style="color: var(--accent-color); font-size: 1.1rem; margin-bottom: 1.5rem;">
-                        Aguardando início...
-                    </h3>
+            <nav class="sidebar-nav">
+                <div class="nav-group">
+                    <h3>1. Jogo Agressor (IP)</h3>
+                    <button class="nav-item active" data-mode="rfi">RFI & All-in Short</button>
+                    <button class="nav-item" data-mode="cbet-ip">C-Bet Flop IP</button>
+                </div>
+
+                <div class="nav-group">
+                    <h3>2. Defesa (BB)</h3>
+                    <button class="nav-item" data-mode="bb-vs-rfi">BB vs RFI (Single)</button>
+                    <button class="nav-item" data-mode="bb-vs-cbet">BB vs C-Bet Flop</button>
+                    <button class="nav-item" data-mode="bb-vs-rfi-mw">BB vs RFI (Multi-Way)</button>
+                </div>
+
+                <div class="nav-group">
+                    <h3>3. Blind War</h3>
+                    <button class="nav-item" data-mode="bw-sb">BW: SB Strategy</button>
+                    <button class="nav-item" data-mode="bw-bb">BW: BB Defense</button>
+                </div>
+
+                <div class="nav-group">
+                    <h3>4. Late Position Steals</h3>
+                    <button class="nav-item" data-mode="sb-vs-rfi">SB vs RFI</button>
+                    <button class="nav-item" data-mode="btn-vs-rfi">BTN vs RFI</button>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <h1 id="module-title">Treinador: RFI & All-in Short</h1>
+                <div class="status-badge">Engine: Online</div>
+            </header>
+
+            <div class="dashboard">
+                <section class="panel inputs-panel">
+                    <h2>Configuração</h2>
                     
-                    <div class="card-slots" id="hero-slots">
-                        <div class="card-slot empty" id="slot-1"></div>
-                        <div class="card-slot empty" id="slot-2"></div>
+                    <div class="input-group" id="config-positions">
+                        <label for="train-position">Sua Posição</label>
+                        <select id="train-position" class="custom-select">
+                            <option value="utg">UTG</option>
+                            <option value="mp">MP</option>
+                            <option value="co">Cutoff</option>
+                            <option value="btn">Button</option>
+                            <option value="sb">Small Blind</option>
+                        </select>
                     </div>
-                </div>
 
-                <div class="action-buttons" id="action-controls" style="display: none; margin-top: 2rem; gap: 1rem; width: 100%; justify-content: center;">
-                    <button class="btn-action fold" id="action-fold">FOLD</button>
-                    <button class="btn-action call" id="action-call">CALL</button>
-                    <button class="btn-action raise" id="action-raise">RAISE</button>
-                </div>
-            </div>
-        </section>
-
-        <section class="panel results-panel">
-            <h2>Desempenho</h2>
-            
-            <div class="result-box">
-                <div style="display: flex; justify-content: space-between; width: 100%;">
-                    <div style="text-align: center;">
-                        <span class="result-label">Acertos</span>
-                        <span class="result-value accent" id="score-correct">0</span>
+                    <div class="input-group hidden" id="config-villain" style="margin-top: 1rem;">
+                        <label for="villain-position">Posição do Vilão</label>
+                        <select id="villain-position" class="custom-select">
+                            <option value="utg">UTG</option>
+                            <option value="co">Cutoff</option>
+                            <option value="btn">Button</option>
+                        </select>
                     </div>
-                    <div style="text-align: center;">
-                        <span class="result-label">Erros</span>
-                        <span class="result-value danger" id="score-wrong" style="color: var(--danger-color);">0</span>
-                    </div>
-                </div>
-            </div>
 
-            <div class="feedback-box highlight" id="feedback-display" style="margin-top: 1.5rem; min-height: 100px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 1rem;">
-                <p id="feedback-text" style="color: var(--text-muted);">Inicie a sessão para receber mãos.</p>
+                    <p id="module-description" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem;">
+                        A ação rodou em FOLD até você. Qual a decisão correta?
+                    </p>
+
+                    <button class="btn-primary" id="btn-start-training" style="margin-top: 2rem;">Iniciar Sessão</button>
+                    <button class="btn-secondary" id="btn-stop-training" style="display: none; margin-top: 0.5rem;">Parar Sessão</button>
+                </section>
+
+                <section class="panel cards-panel">
+                    <h2>Mesa</h2>
+                    
+                    <div class="table-layout">
+                        <div class="hand-group hero-group">
+                            <h3 id="scenario-text" style="color: var(--accent-color); font-size: 1.1rem; margin-bottom: 1.5rem;">
+                                Aguardando início...
+                            </h3>
+                            
+                            <div class="card-slots" id="hero-slots">
+                                <div class="card-slot empty" id="slot-1"></div>
+                                <div class="card-slot empty" id="slot-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="hand-group board-group hidden" id="board-area" style="margin-top: 1.5rem;">
+                            <h3>Flop</h3>
+                            <div class="card-slots board-slots" id="board-slots">
+                                <div class="card-slot empty flop" id="flop-1"></div>
+                                <div class="card-slot empty flop" id="flop-2"></div>
+                                <div class="card-slot empty flop" id="flop-3"></div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons" id="action-controls" style="display: none; margin-top: 2rem; gap: 1rem; width: 100%; justify-content: center;">
+                            <button class="btn-action fold" id="action-fold">FOLD</button>
+                            <button class="btn-action call" id="action-call">CALL</button>
+                            <button class="btn-action raise" id="action-raise">RAISE</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel results-panel">
+                    <h2>Desempenho</h2>
+                    <div class="result-box">
+                        <div style="display: flex; justify-content: space-between; width: 100%;">
+                            <div style="text-align: center;">
+                                <span class="result-label">Acertos</span>
+                                <span class="result-value accent" id="score-correct">0</span>
+                            </div>
+                            <div style="text-align: center;">
+                                <span class="result-label">Erros</span>
+                                <span class="result-value danger" id="score-wrong">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feedback-box highlight" id="feedback-display" style="margin-top: 1.5rem; min-height: 100px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 1rem;">
+                        <p id="feedback-text" style="color: var(--text-muted);">Selecione um módulo e inicie a sessão.</p>
+                    </div>
+                </section>
             </div>
-        </section>
-    </main>
+        </main>
+    </div>
 
     <script type="module" src="js/main.js"></script>
 </body>

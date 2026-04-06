@@ -1,29 +1,10 @@
-// js/engine.js
+// js/ranges/rfi.js
 
-// Ranges de RFI (Raise First In) padrão
-// Todas as mãos nestes conjuntos são consideradas RAISE. O resto é FOLD.
-const rfiRanges = {
+// Ranges GTO de RFI (Raise First In)
+export const rfiRanges = {
     utg: new Set(['AA','KK','QQ','JJ','TT','99','88','77', 'AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s', 'KQs','KJs','KTs','K9s', 'QJs','QTs','JTs','T9s','98s', 'AKo','AQo','AJo','KQo']),
     mp: new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55', 'AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s', 'KQs','KJs','KTs','K9s','K8s', 'QJs','QTs','Q9s', 'JTs','J9s','T9s','98s','87s', 'AKo','AQo','AJo','ATo','KQo','KJo']),
     co: new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22', 'AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s', 'KQs','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s', 'QJs','QTs','Q9s','Q8s', 'JTs','J9s','J8s', 'T9s','T8s','98s','97s','87s','76s','65s','54s', 'AKo','AQo','AJo','ATo','A9o', 'KQo','KJo','KTo','QJo','QTo','JTo']),
     btn: new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22', 'AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s', 'KQs','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s', 'QJs','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','Q3s','Q2s', 'JTs','J9s','J8s','J7s', 'T9s','T8s','T7s', '98s','97s','96s', '87s','86s', '76s','75s', '65s','54s','43s', 'AKo','AQo','AJo','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o', 'KQo','KJo','KTo','K9o', 'QJo','QTo','Q9o', 'JTo','J9o','T9o','98o']),
     sb: new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22', 'AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s', 'KQs','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s', 'QJs','QTs','Q9s','Q8s','Q7s', 'JTs','J9s','J8s', 'T9s','T8s', '98s','97s', '87s', '76s', '65s', 'AKo','AQo','AJo','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o', 'KQo','KJo','KTo','K9o', 'QJo','QTo','Q9o', 'JTo','J9o','T9o'])
 };
-
-export function evaluateAction(position, handNotation, action) {
-    const isRaiseHand = rfiRanges[position].has(handNotation);
-    
-    // Na teoria de poker moderna, "Open Limp" (Call pré-flop como 1º a agir) é considerado um erro estratégico na maioria das vezes.
-    if (action === 'raise') {
-        if (isRaiseHand) return { correct: true, msg: `Excelente! ${handNotation} é um Raise padrão da posição ${position.toUpperCase()}.` };
-        else return { correct: false, msg: `Erro de agressividade. ${handNotation} é muito fraco para abrir do ${position.toUpperCase()}. O correto seria FOLD.` };
-    } 
-    else if (action === 'fold') {
-        if (!isRaiseHand) return { correct: true, msg: `Bom Fold. ${handNotation} não tem força suficiente para jogar do ${position.toUpperCase()}.` };
-        else return { correct: false, msg: `Erro crítico! Você está a jogar muito tight. ${handNotation} é forte demais para foldar do ${position.toUpperCase()}. O correto seria RAISE.` };
-    }
-    else if (action === 'call') {
-        if (isRaiseHand) return { correct: false, msg: `Erro! Não faça Open Limp (Call). ${handNotation} é uma mão forte e o correto é entrar com RAISE.` };
-        else return { correct: false, msg: `Erro! Evite entrar de limp com mãos fracas como ${handNotation}. O correto é FOLD.` };
-    }
-}
