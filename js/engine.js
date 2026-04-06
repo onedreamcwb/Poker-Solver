@@ -1,29 +1,62 @@
 // js/engine.js
+import { rfiRanges } from './ranges/rfi.js';
+import { bbVsRfiRanges } from './ranges/bb_vs_rfi.js';
 
-// Ranges de RFI (Raise First In) padrão
-// Todas as mãos nestes conjuntos são consideradas RAISE. O resto é FOLD.
-const rfiRanges = {
-    utg: new Set(['AA','KK','QQ','JJ','TT','99','88','77', 'AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s', 'KQs','KJs','KTs','K9s', 'QJs','QTs','JTs','T9s','98s', 'AKo','AQo','AJo','KQo']),
-    mp: new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55', 'AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s', 'KQs','KJs','KTs','K9s','K8s', 'QJs','QTs','Q9s', 'JTs','J9s','T9s','98s','87s', 'AKo','AQo','AJo','ATo','KQo','KJo']),
-    co: new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22', 'AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s', 'KQs','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s', 'QJs','QTs','Q9s','Q8s', 'JTs','J9s','J8s', 'T9s','T8s','98s','97s','87s','76s','65s','54s', 'AKo','AQo','AJo','ATo','A9o', 'KQo','KJo','KTo','QJo','QTo','JTo']),
-    btn: new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22', 'AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s', 'KQs','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s', 'QJs','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','Q3s','Q2s', 'JTs','J9s','J8s','J7s', 'T9s','T8s','T7s', '98s','97s','96s', '87s','86s', '76s','75s', '65s','54s','43s', 'AKo','AQo','AJo','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o', 'KQo','KJo','KTo','K9o', 'QJo','QTo','Q9o', 'JTo','J9o','T9o','98o']),
-    sb: new Set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22', 'AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s', 'KQs','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s', 'QJs','QTs','Q9s','Q8s','Q7s', 'JTs','J9s','J8s', 'T9s','T8s', '98s','97s', '87s', '76s', '65s', 'AKo','AQo','AJo','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o', 'KQo','KJo','KTo','K9o', 'QJo','QTo','Q9o', 'JTo','J9o','T9o'])
-};
+// ---- AVALIADOR UNIVERSAL GTO ----
+export function evaluateAction(mode, heroPos, villainPos, handNotation, action) {
+    
+    switch (mode) {
+        case 'rfi':
+            return evaluateRFI(heroPos, handNotation, action);
+        
+        case 'bb-vs-rfi':
+            return evaluateBBvsRFI(villainPos, handNotation, action);
+            
+        case 'cbet-ip':
+            return { correct: false, msg: `Módulo C-Bet IP em construção.` };
+            
+        default:
+            return { correct: false, msg: `Módulo em desenvolvimento...` };
+    }
+}
 
-export function evaluateAction(position, handNotation, action) {
+// ---- LÓGICA DO MÓDULO 1: RFI ----
+function evaluateRFI(position, handNotation, action) {
     const isRaiseHand = rfiRanges[position].has(handNotation);
     
-    // Na teoria de poker moderna, "Open Limp" (Call pré-flop como 1º a agir) é considerado um erro estratégico na maioria das vezes.
     if (action === 'raise') {
-        if (isRaiseHand) return { correct: true, msg: `Excelente! ${handNotation} é um Raise padrão da posição ${position.toUpperCase()}.` };
-        else return { correct: false, msg: `Erro de agressividade. ${handNotation} é muito fraco para abrir do ${position.toUpperCase()}. O correto seria FOLD.` };
+        return isRaiseHand 
+            ? { correct: true, msg: `Excelente! ${handNotation} é um Raise padrão de ${position.toUpperCase()}.` }
+            : { correct: false, msg: `Erro. ${handNotation} é muito fraco para abrir de ${position.toUpperCase()}. Faça FOLD.` };
+    } else if (action === 'fold') {
+        return !isRaiseHand 
+            ? { correct: true, msg: `Bom Fold. ${handNotation} não joga de ${position.toUpperCase()}.` }
+            : { correct: false, msg: `Erro crítico! ${handNotation} é forte demais para foldar de ${position.toUpperCase()}. Faça RAISE.` };
+    } else if (action === 'call') {
+        return { correct: false, msg: `Erro! Evite Open Limp (Call). Se a mão for forte, faça RAISE. Se não, FOLD.` };
+    }
+}
+
+// ---- LÓGICA DO MÓDULO 2: BB vs RFI ----
+function evaluateBBvsRFI(villainPos, handNotation, action) {
+    // Garante que a posição do vilão existe no nosso ficheiro
+    if (!bbVsRfiRanges[villainPos]) return { correct: false, msg: `Selecione um Vilão válido (UTG, CO, BTN).` };
+
+    const should3Bet = bbVsRfiRanges[villainPos].threeBet.has(handNotation);
+    const shouldCall = bbVsRfiRanges[villainPos].call.has(handNotation);
+    
+    if (action === '3-bet') {
+        if (should3Bet) return { correct: true, msg: `Perfeito! ${handNotation} é um 3-Bet excelente contra o ${villainPos.toUpperCase()}.` };
+        if (shouldCall) return { correct: false, msg: `Excesso de agressividade. ${handNotation} joga melhor de CALL contra o ${villainPos.toUpperCase()}.` };
+        return { correct: false, msg: `Erro! ${handNotation} é puro lixo contra o ${villainPos.toUpperCase()}. O correto é FOLD.` };
+    } 
+    else if (action === 'call') {
+        if (shouldCall) return { correct: true, msg: `Bom Call! Defenda o BB com ${handNotation} contra o ${villainPos.toUpperCase()}.` };
+        if (should3Bet) return { correct: false, msg: `Erro passivo! ${handNotation} é premium. Não faça apenas Call, aplique o 3-BET!` };
+        return { correct: false, msg: `Erro. ${handNotation} é muito fraco para pagar um raise do ${villainPos.toUpperCase()}. Faça FOLD.` };
     } 
     else if (action === 'fold') {
-        if (!isRaiseHand) return { correct: true, msg: `Bom Fold. ${handNotation} não tem força suficiente para jogar do ${position.toUpperCase()}.` };
-        else return { correct: false, msg: `Erro crítico! Você está a jogar muito tight. ${handNotation} é forte demais para foldar do ${position.toUpperCase()}. O correto seria RAISE.` };
-    }
-    else if (action === 'call') {
-        if (isRaiseHand) return { correct: false, msg: `Erro! Não faça Open Limp (Call). ${handNotation} é uma mão forte e o correto é entrar com RAISE.` };
-        else return { correct: false, msg: `Erro! Evite entrar de limp com mãos fracas como ${handNotation}. O correto é FOLD.` };
+        if (!should3Bet && !shouldCall) return { correct: true, msg: `Bom Fold. Sem força para enfrentar o ${villainPos.toUpperCase()}.` };
+        return { correct: false, msg: `Fold incorreto. O BB precisa ser defendido com ${handNotation}.` };
     }
 }

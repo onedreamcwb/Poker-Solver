@@ -8,6 +8,7 @@ const moduleTitle = document.getElementById('module-title');
 const moduleDesc = document.getElementById('module-description');
 
 const boardArea = document.getElementById('board-area');
+const configHero = document.getElementById('config-positions'); // Adicione esta linha
 const configVillain = document.getElementById('config-villain');
 const posSelect = document.getElementById('train-position');
 const villainSelect = document.getElementById('villain-position');
@@ -37,6 +38,7 @@ let currentPosition = '';
 let score = { correct: 0, wrong: 0 };
 
 // ---- CONTROLADOR DE NAVEGAÇÃO (LMS) ----
+// ---- CONTROLADOR DE NAVEGAÇÃO (LMS) ----
 function switchMode(mode, clickedElement) {
     if (isTraining) {
         alert("Por favor, pare a sessão atual antes de trocar de módulo.");
@@ -45,44 +47,57 @@ function switchMode(mode, clickedElement) {
 
     currentMode = mode;
 
-    // Atualiza Visual do Menu
     navItems.forEach(item => item.classList.remove('active'));
     clickedElement.classList.add('active');
     moduleTitle.innerText = `Treinador: ${clickedElement.innerText}`;
 
-    // Adapta a Interface Baseado no Módulo Escolhido
     if (mode === 'rfi') {
         moduleDesc.innerText = "A ação rodou em FOLD até você. Qual a decisão correta?";
         boardArea.classList.add('hidden');
         configVillain.classList.add('hidden');
+        configHero.classList.remove('hidden'); // MOSTRA O SELETOR DO HERO
         
         btnAction1.innerText = 'FOLD'; btnAction1.className = 'btn-action fold';
         btnAction2.innerText = 'CALL'; btnAction2.className = 'btn-action call';
         btnAction3.innerText = 'RAISE'; btnAction3.className = 'btn-action raise';
         btnAction3.style.display = 'block';
 
-    } else if (mode === 'cbet-ip') {
-        moduleDesc.innerText = "Você deu Raise pré-flop e o BB pagou. O Flop bateu. Ação?";
-        boardArea.classList.remove('hidden'); // Revela as 3 cartas do Flop
-        configVillain.classList.add('hidden');
-        
-        btnAction1.innerText = 'CHECK'; btnAction1.className = 'btn-action fold'; // Reutilizando cores
-        btnAction2.innerText = 'BET'; btnAction2.className = 'btn-action raise';
-        btnAction3.style.display = 'none'; // Esconde o terceiro botão
-
     } else if (mode.includes('bb-vs')) {
         moduleDesc.innerText = "Um oponente deu Raise. Você está no Big Blind. O que fazer?";
         boardArea.classList.add('hidden');
-        configVillain.classList.remove('hidden'); // Pede para selecionar a posição do Vilão
+        configHero.classList.add('hidden'); // ESCONDE O SELETOR DO HERO (Hero é fixo no BB)
+        configVillain.classList.remove('hidden'); 
         
         btnAction1.innerText = 'FOLD'; btnAction1.className = 'btn-action fold';
         btnAction2.innerText = 'CALL'; btnAction2.className = 'btn-action call';
         btnAction3.innerText = '3-BET'; btnAction3.className = 'btn-action raise';
         btnAction3.style.display = 'block';
     } else {
+        // Para os módulos em construção (ex: C-Bet)
         moduleDesc.innerText = "Módulo em desenvolvimento... Prepare-se!";
         boardArea.classList.add('hidden');
         configVillain.classList.add('hidden');
+        configHero.classList.add('hidden');
+    }
+}
+
+// ---- FUNÇÕES VISUAIS (CARTAS) ----
+// (Mantenha as funções updateCardSlot e clearCardSlot iguais...)
+
+function dealNewHand() {
+    currentHand = drawRandomHand();
+    currentNotation = getHandNotation(currentHand[0], currentHand[1]);
+    
+    updateCardSlot(slot1, currentHand[0]);
+    updateCardSlot(slot2, currentHand[1]);
+    
+    // Texto dinâmico que avisa exatamente o que está a acontecer na mesa
+    if (currentMode === 'rfi') {
+        scenarioText.innerText = `Posição: ${currentPosition.toUpperCase()}. Qual a sua ação?`;
+    } else if (currentMode === 'bb-vs-rfi') {
+        scenarioText.innerText = `Vilão no ${villainSelect.value.toUpperCase()} deu Raise. Você no BB. Ação?`;
+    } else {
+        scenarioText.innerText = `Cenário carregado. Ação?`;
     }
 }
 
@@ -106,26 +121,12 @@ function clearCardSlot(slot) {
     slot.innerHTML = '';
 }
 
-function dealNewHand() {
-    currentHand = drawRandomHand();
-    currentNotation = getHandNotation(currentHand[0], currentHand[1]);
-    
-    updateCardSlot(slot1, currentHand[0]);
-    updateCardSlot(slot2, currentHand[1]);
-    
-    if (currentMode === 'rfi') {
-        scenarioText.innerText = `Posição: ${currentPosition.toUpperCase()}. Qual a sua ação?`;
-    } else {
-        scenarioText.innerText = `Cenário carregado. Ação?`;
-    }
-}
-
 // ---- NÚCLEO DO JOGO ----
 function handleAction(actionType) {
     if (!isTraining) return;
     
     // O motor vai avaliar baseado no MODO atual, na sua mão e na sua posição
-    const result = evaluateAction(currentMode, currentPosition, currentNotation, actionType);
+    const result = evaluateAction(currentMode, currentPosition, villainSelect.value, currentNotation, actionType);
     
     feedbackDisplay.classList.remove('success', 'error');
     
@@ -145,10 +146,26 @@ function handleAction(actionType) {
 
 // ---- EVENTOS DOS BOTÕES ----
 btnStart.addEventListener('click', () => {
-    if(currentMode !== 'rfi') {
-        alert("Chefe, por enquanto apenas a lógica RFI está programada no Motor. Use o menu lateral para voltar ao RFI.");
+    // Se não for um dos módulos prontos, bloqueia
+    if(currentMode !== 'rfi' && currentMode !== 'bb-vs-rfi') {
+        alert("Chefe, por enquanto apenas RFI e BB vs RFI estão programados no Motor. Use o menu lateral.");
         return;
     }
+
+    isTraining = true;
+    score = { correct: 0, wrong: 0 };
+    scoreCorrectEl.innerText = '0';
+    scoreWrongEl.innerText = '0';
+        // Se o modo for Defesa do BB, força o Hero a ser o Big Blind internamente
+    if (currentMode === 'bb-vs-rfi') {
+        currentPosition = 'bb';
+        villainSelect.disabled = true; // Trava o vilão para não mudar durante a sessão
+    } else {
+        currentPosition = posSelect.value;
+        posSelect.disabled = true;
+    }
+    
+    // ... (o resto do código do btnStart mantém-se igual)
 
     isTraining = true;
     score = { correct: 0, wrong: 0 };
