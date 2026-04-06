@@ -420,7 +420,65 @@ body {
     background-color: var(--accent-color);
     transition: width 0.1s linear;
 }
+/* =========================================
+   ESTILOS ESPECÍFICOS DO TREINADOR RFI
+   ========================================= */
 
+/* Botões de Ação do Jogo */
+.action-buttons {
+    display: flex;
+}
+
+.btn-action {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    transition: transform 0.1s, filter 0.2s;
+    flex: 1;
+    max-width: 150px;
+}
+
+.btn-action:hover {
+    filter: brightness(1.2);
+    transform: translateY(-2px);
+}
+
+.btn-action:active {
+    transform: translateY(0);
+}
+
+.btn-action.fold { background-color: #4a4a4a; }
+.btn-action.call { background-color: #3b82f6; }
+.btn-action.raise { background-color: #ef4444; color: #fff; }
+
+/* Status de Feedback */
+.feedback-box {
+    border-radius: 6px;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.feedback-box.success {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+}
+
+.feedback-box.error {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.2);
+}
+
+.danger {
+    color: var(--danger-color) !important;
+}
+.accent {
+    color: var(--accent-color) !important;
+}
 /* =========================================
    RESPONSIVIDADE (Mobile e Tablets)
    ========================================= */

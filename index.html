@@ -3,130 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poker Study Solver | Pro Edition</title>
+    <title>Poker RFI Trainer | Pro Edition</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header class="topbar">
-        <h1>Poker Study <span class="accent">Solver</span></h1>
-        <div class="status-badge">Engine: Online</div>
+        <h1>Poker RFI <span class="accent">Trainer</span></h1>
+        <div class="status-badge">Mode: Pre-Flop Drill</div>
     </header>
 
     <main class="dashboard">
         <section class="panel inputs-panel">
-            <h2>Parâmetros da Mão</h2>
+            <h2>Configuração</h2>
             
             <div class="input-group">
-                <label for="hero-position">Posição do Hero</label>
-                <select id="hero-position" class="custom-select">
+                <label for="train-position">Treinar Posição</label>
+                <select id="train-position" class="custom-select">
                     <option value="utg">UTG (Early Position)</option>
                     <option value="mp">MP (Middle Position)</option>
                     <option value="co">Cutoff</option>
                     <option value="btn">Button</option>
                     <option value="sb">Small Blind</option>
-                    <option value="bb">Big Blind</option>
                 </select>
             </div>
 
-            <div class="input-group">
-                <label for="villain-position">Posição do Villain</label>
-                <select id="villain-position" class="custom-select">
-                    <option value="bb">Big Blind (Defesa)</option>
-                    <option value="utg">UTG</option>
-                    <option value="mp">MP</option>
-                    <option value="co">Cutoff</option>
-                    <option value="btn">Button</option>
-                    <option value="sb">Small Blind</option>
-                </select>
-            </div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem;">
+                Todas as mãos simulam que a ação rodou em FOLD até você.
+            </p>
 
-            <button class="btn-secondary" id="btn-open-matrix">Visualizar Range (13x13)</button>
-
-            <div class="input-group" style="margin-top: 1rem;">
-                <label for="pot-size">Tamanho do Pote (BB)</label>
-                <input type="number" id="pot-size" placeholder="Ex: 10.5" step="0.1">
-            </div>
-
-            <div class="input-group">
-                <label for="hero-bet">Aposta do Hero (BB)</label>
-                <input type="number" id="hero-bet" placeholder="Ex: 5" step="0.1">
-            </div>
-
-            <div class="input-group">
-                <label for="villain-bet">Aposta do Villain (BB)</label>
-                <input type="number" id="villain-bet" placeholder="Ex: 5" step="0.1">
-            </div>
-            
-            <button class="btn-primary" id="btn-calculate" disabled>Calcular EV</button>
+            <button class="btn-primary" id="btn-start-training" style="margin-top: 2rem;">Iniciar Sessão</button>
+            <button class="btn-secondary" id="btn-stop-training" style="display: none; margin-top: 0.5rem;">Parar Sessão</button>
         </section>
 
         <section class="panel cards-panel">
-            <h2>Mesa e Ranges</h2>
+            <h2>Mesa</h2>
             
             <div class="table-layout">
                 <div class="hand-group hero-group">
-                    <h3>Hero</h3>
+                    <h3 id="scenario-text" style="color: var(--accent-color); font-size: 1.1rem; margin-bottom: 1.5rem;">
+                        Aguardando início...
+                    </h3>
+                    
                     <div class="card-slots" id="hero-slots">
-                        <div class="card-slot empty" data-owner="hero" data-index="0"></div>
-                        <div class="card-slot empty" data-owner="hero" data-index="1"></div>
+                        <div class="card-slot empty" id="slot-1"></div>
+                        <div class="card-slot empty" id="slot-2"></div>
                     </div>
                 </div>
 
-                <div class="hand-group board-group">
-                    <h3>Board</h3>
-                    <div class="card-slots board-slots" id="board-slots">
-                        <div class="card-slot empty flop" data-owner="board" data-index="0"></div>
-                        <div class="card-slot empty flop" data-owner="board" data-index="1"></div>
-                        <div class="card-slot empty flop" data-owner="board" data-index="2"></div>
-                        <div class="card-slot empty turn" data-owner="board" data-index="3"></div>
-                        <div class="card-slot empty river" data-owner="board" data-index="4"></div>
-                    </div>
-                </div>
-
-                <div class="hand-group villain-group">
-                    <h3>Villain</h3>
-                    <div class="card-slots" id="villain-slots">
-                        <div class="card-slot empty" data-owner="villain" data-index="0"></div>
-                        <div class="card-slot empty" data-owner="villain" data-index="1"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="deck-container" class="deck-container hidden">
-                </div>
-
-            <div id="matrix-container" class="matrix-wrapper hidden">
-                <div class="matrix-header">
-                    <h3>Editor de Range <span id="matrix-target-label">- Villain</span></h3>
-                    <button id="btn-close-matrix" class="btn-close">X</button>
-                </div>
-                <div id="hand-matrix" class="hand-matrix">
-                    </div>
-                <div class="matrix-controls">
-                    <button id="btn-clear-matrix" class="btn-secondary">Limpar Range</button>
-                    <button id="btn-apply-position" class="btn-secondary">Aplicar Padrão da Posição</button>
+                <div class="action-buttons" id="action-controls" style="display: none; margin-top: 2rem; gap: 1rem; width: 100%; justify-content: center;">
+                    <button class="btn-action fold" id="action-fold">FOLD</button>
+                    <button class="btn-action call" id="action-call">CALL</button>
+                    <button class="btn-action raise" id="action-raise">RAISE</button>
                 </div>
             </div>
         </section>
 
         <section class="panel results-panel">
-            <h2>Análise Monte Carlo</h2>
+            <h2>Desempenho</h2>
             
             <div class="result-box">
-                <span class="result-label">Hero Equity</span>
-                <span class="result-value" id="res-equity">--%</span>
-            </div>
-
-            <div class="result-box highlight">
-                <span class="result-label">Expected Value (EV)</span>
-                <span class="result-value" id="res-ev">--</span>
-            </div>
-
-            <div class="stats-footer">
-                <p>Iterações: <span id="mc-iterations">0</span> / 10.000</p>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="mc-progress"></div>
+                <div style="display: flex; justify-content: space-between; width: 100%;">
+                    <div style="text-align: center;">
+                        <span class="result-label">Acertos</span>
+                        <span class="result-value accent" id="score-correct">0</span>
+                    </div>
+                    <div style="text-align: center;">
+                        <span class="result-label">Erros</span>
+                        <span class="result-value danger" id="score-wrong" style="color: var(--danger-color);">0</span>
+                    </div>
                 </div>
+            </div>
+
+            <div class="feedback-box highlight" id="feedback-display" style="margin-top: 1.5rem; min-height: 100px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 1rem;">
+                <p id="feedback-text" style="color: var(--text-muted);">Inicie a sessão para receber mãos.</p>
             </div>
         </section>
     </main>
