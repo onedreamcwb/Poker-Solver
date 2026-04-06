@@ -61,6 +61,27 @@ function switchMode(mode, clickedElement) {
         btnAction2.innerText = 'CALL'; btnAction2.className = 'btn-action call';
         btnAction3.innerText = 'RAISE'; btnAction3.className = 'btn-action raise';
         btnAction3.style.display = 'block';
+    } else if (mode === 'bw-sb') {
+        moduleDesc.innerText = "Ação rodou em Fold até você no Small Blind. O que fazer?";
+        boardArea.classList.add('hidden');
+        configHero.classList.add('hidden');
+        configVillain.classList.add('hidden');
+        
+        btnAction1.innerText = 'FOLD'; btnAction1.className = 'btn-action fold';
+        btnAction2.innerText = 'LIMP'; btnAction2.className = 'btn-action call'; // Botão exclusivo deste modo
+        btnAction3.innerText = 'RAISE'; btnAction3.className = 'btn-action raise';
+        btnAction3.style.display = 'block';
+
+    } else if (mode === 'bw-bb') {
+        moduleDesc.innerText = "O Small Blind deu Raise. Você está no Big Blind. O que fazer?";
+        boardArea.classList.add('hidden');
+        configHero.classList.add('hidden');
+        configVillain.classList.add('hidden');
+        
+        btnAction1.innerText = 'FOLD'; btnAction1.className = 'btn-action fold';
+        btnAction2.innerText = 'CALL'; btnAction2.className = 'btn-action call';
+        btnAction3.innerText = '3-BET'; btnAction3.className = 'btn-action raise';
+        btnAction3.style.display = 'block';    
 
     } else if (mode.includes('bb-vs')) {
         moduleDesc.innerText = "Um oponente deu Raise. Você está no Big Blind. O que fazer?";
@@ -96,6 +117,10 @@ function dealNewHand() {
         scenarioText.innerText = `Posição: ${currentPosition.toUpperCase()}. Qual a sua ação?`;
     } else if (currentMode === 'bb-vs-rfi') {
         scenarioText.innerText = `Vilão no ${villainSelect.value.toUpperCase()} deu Raise. Você no BB. Ação?`;
+    } else if (currentMode === 'bw-sb') {
+        scenarioText.innerText = `Todos Fold. Você no SB. Ação?`;
+    } else if (currentMode === 'bw-bb') {
+        scenarioText.innerText = `Small Blind deu Raise. Você no BB. Ação?`;
     } else {
         scenarioText.innerText = `Cenário carregado. Ação?`;
     }
@@ -147,8 +172,9 @@ function handleAction(actionType) {
 // ---- EVENTOS DOS BOTÕES ----
 btnStart.addEventListener('click', () => {
     // Se não for um dos módulos prontos, bloqueia
-    if(currentMode !== 'rfi' && currentMode !== 'bb-vs-rfi') {
-        alert("Chefe, por enquanto apenas RFI e BB vs RFI estão programados no Motor. Use o menu lateral.");
+    // Libera os novos modos para treinar
+    if(currentMode !== 'rfi' && currentMode !== 'bb-vs-rfi' && currentMode !== 'bw-sb' && currentMode !== 'bw-bb') {
+        alert("Módulo ainda em desenvolvimento. Tente os blocos 1, 2 ou 3.");
         return;
     }
 
@@ -156,10 +182,13 @@ btnStart.addEventListener('click', () => {
     score = { correct: 0, wrong: 0 };
     scoreCorrectEl.innerText = '0';
     scoreWrongEl.innerText = '0';
-        // Se o modo for Defesa do BB, força o Hero a ser o Big Blind internamente
-    if (currentMode === 'bb-vs-rfi') {
+    
+    // Força a posição correta silenciosamente
+    if (currentMode === 'bb-vs-rfi' || currentMode === 'bw-bb') {
         currentPosition = 'bb';
-        villainSelect.disabled = true; // Trava o vilão para não mudar durante a sessão
+        villainSelect.disabled = true;
+    } else if (currentMode === 'bw-sb') {
+        currentPosition = 'sb';
     } else {
         currentPosition = posSelect.value;
         posSelect.disabled = true;
