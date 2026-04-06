@@ -38,8 +38,8 @@ let currentPosition = '';
 let score = { correct: 0, wrong: 0 };
 
 // ---- CONTROLADOR DE NAVEGAÇÃO (LMS) ----
-// ---- CONTROLADOR DE NAVEGAÇÃO (LMS) ----
 function switchMode(mode, clickedElement) {
+    // Trava de segurança se estiver no meio de um treino
     if (isTraining) {
         alert("Por favor, pare a sessão atual antes de trocar de módulo.");
         return;
@@ -47,20 +47,36 @@ function switchMode(mode, clickedElement) {
 
     currentMode = mode;
 
+    // Atualiza Visual do Menu Lateral
     navItems.forEach(item => item.classList.remove('active'));
     clickedElement.classList.add('active');
     moduleTitle.innerText = `Treinador: ${clickedElement.innerText}`;
 
+    // ---- BLOCO 1: RFI ----
     if (mode === 'rfi') {
         moduleDesc.innerText = "A ação rodou em FOLD até você. Qual a decisão correta?";
         boardArea.classList.add('hidden');
         configVillain.classList.add('hidden');
-        configHero.classList.remove('hidden'); // MOSTRA O SELETOR DO HERO
+        configHero.classList.remove('hidden'); 
         
         btnAction1.innerText = 'FOLD'; btnAction1.className = 'btn-action fold';
         btnAction2.innerText = 'CALL'; btnAction2.className = 'btn-action call';
         btnAction3.innerText = 'RAISE'; btnAction3.className = 'btn-action raise';
         btnAction3.style.display = 'block';
+
+    // ---- BLOCO 2: BB vs RFI ----
+    } else if (mode === 'bb-vs-rfi') {
+        moduleDesc.innerText = "Um oponente deu Raise. Você está no Big Blind. O que fazer?";
+        boardArea.classList.add('hidden');
+        configHero.classList.add('hidden'); 
+        configVillain.classList.remove('hidden'); 
+        
+        btnAction1.innerText = 'FOLD'; btnAction1.className = 'btn-action fold';
+        btnAction2.innerText = 'CALL'; btnAction2.className = 'btn-action call';
+        btnAction3.innerText = '3-BET'; btnAction3.className = 'btn-action raise';
+        btnAction3.style.display = 'block';
+
+    // ---- BLOCO 3: BLIND WAR (Hero no SB) ----
     } else if (mode === 'bw-sb') {
         moduleDesc.innerText = "Ação rodou em Fold até você no Small Blind. O que fazer?";
         boardArea.classList.add('hidden');
@@ -68,10 +84,11 @@ function switchMode(mode, clickedElement) {
         configVillain.classList.add('hidden');
         
         btnAction1.innerText = 'FOLD'; btnAction1.className = 'btn-action fold';
-        btnAction2.innerText = 'LIMP'; btnAction2.className = 'btn-action call'; // Botão exclusivo deste modo
+        btnAction2.innerText = 'LIMP'; btnAction2.className = 'btn-action call'; // Botão LIMP exclusivo
         btnAction3.innerText = 'RAISE'; btnAction3.className = 'btn-action raise';
         btnAction3.style.display = 'block';
 
+    // ---- BLOCO 3: BLIND WAR (Hero no BB) ----
     } else if (mode === 'bw-bb') {
         moduleDesc.innerText = "O Small Blind deu Raise. Você está no Big Blind. O que fazer?";
         boardArea.classList.add('hidden');
@@ -81,20 +98,32 @@ function switchMode(mode, clickedElement) {
         btnAction1.innerText = 'FOLD'; btnAction1.className = 'btn-action fold';
         btnAction2.innerText = 'CALL'; btnAction2.className = 'btn-action call';
         btnAction3.innerText = '3-BET'; btnAction3.className = 'btn-action raise';
-        btnAction3.style.display = 'block';    
+        btnAction3.style.display = 'block';
 
-    } else if (mode.includes('bb-vs')) {
-        moduleDesc.innerText = "Um oponente deu Raise. Você está no Big Blind. O que fazer?";
+    // ---- BLOCO 4: LATE POSITION STEALS (SB e BTN vs RFI) ----
+    } else if (mode === 'sb-vs-rfi' || mode === 'btn-vs-rfi') {
+        const heroName = mode === 'sb-vs-rfi' ? 'Small Blind' : 'Button';
+        moduleDesc.innerText = `Um oponente deu Raise. Você está no ${heroName}. O que fazer?`;
         boardArea.classList.add('hidden');
-        configHero.classList.add('hidden'); // ESCONDE O SELETOR DO HERO (Hero é fixo no BB)
+        configHero.classList.add('hidden');
         configVillain.classList.remove('hidden'); 
         
+        // Bloqueia a opção 'btn' para o vilão se o Hero já for o Button
+        const btnOption = document.querySelector('#villain-position option[value="btn"]');
+        if (mode === 'btn-vs-rfi') {
+            btnOption.disabled = true;
+            if (villainSelect.value === 'btn') villainSelect.value = 'co'; // Redireciona se estiver no BTN
+        } else {
+            btnOption.disabled = false; // SB pode enfrentar o BTN
+        }
+
         btnAction1.innerText = 'FOLD'; btnAction1.className = 'btn-action fold';
         btnAction2.innerText = 'CALL'; btnAction2.className = 'btn-action call';
         btnAction3.innerText = '3-BET'; btnAction3.className = 'btn-action raise';
         btnAction3.style.display = 'block';
+
+    // ---- OUTROS MÓDULOS (Em construção) ----
     } else {
-        // Para os módulos em construção (ex: C-Bet)
         moduleDesc.innerText = "Módulo em desenvolvimento... Prepare-se!";
         boardArea.classList.add('hidden');
         configVillain.classList.add('hidden');
@@ -102,9 +131,7 @@ function switchMode(mode, clickedElement) {
     }
 }
 
-// ---- FUNÇÕES VISUAIS (CARTAS) ----
-// (Mantenha as funções updateCardSlot e clearCardSlot iguais...)
-
+// ---- FUNÇÃO DE DAR AS CARTAS (Textos dinâmicos) ----
 function dealNewHand() {
     currentHand = drawRandomHand();
     currentNotation = getHandNotation(currentHand[0], currentHand[1]);
@@ -112,11 +139,11 @@ function dealNewHand() {
     updateCardSlot(slot1, currentHand[0]);
     updateCardSlot(slot2, currentHand[1]);
     
-    // Texto dinâmico que avisa exatamente o que está a acontecer na mesa
     if (currentMode === 'rfi') {
         scenarioText.innerText = `Posição: ${currentPosition.toUpperCase()}. Qual a sua ação?`;
-    } else if (currentMode === 'bb-vs-rfi') {
-        scenarioText.innerText = `Vilão no ${villainSelect.value.toUpperCase()} deu Raise. Você no BB. Ação?`;
+    } else if (currentMode === 'bb-vs-rfi' || currentMode === 'sb-vs-rfi' || currentMode === 'btn-vs-rfi') {
+        const heroLabel = currentMode.split('-')[0].toUpperCase();
+        scenarioText.innerText = `Vilão no ${villainSelect.value.toUpperCase()} deu Raise. Você no ${heroLabel}. Ação?`;
     } else if (currentMode === 'bw-sb') {
         scenarioText.innerText = `Todos Fold. Você no SB. Ação?`;
     } else if (currentMode === 'bw-bb') {
@@ -169,48 +196,45 @@ function handleAction(actionType) {
     dealNewHand();
 }
 
-// ---- EVENTOS DOS BOTÕES ----
+// ---- EVENTO DO BOTÃO START ----
 btnStart.addEventListener('click', () => {
-    // Se não for um dos módulos prontos, bloqueia
-    // Libera os novos modos para treinar
-    if(currentMode !== 'rfi' && currentMode !== 'bb-vs-rfi' && currentMode !== 'bw-sb' && currentMode !== 'bw-bb') {
-        alert("Módulo ainda em desenvolvimento. Tente os blocos 1, 2 ou 3.");
+    // 1. Verifica se o módulo atual é um dos 6 módulos Pré-Flop que já programámos
+    const preFlopModes = ['rfi', 'bb-vs-rfi', 'bw-sb', 'bw-bb', 'sb-vs-rfi', 'btn-vs-rfi'];
+    if(!preFlopModes.includes(currentMode)) {
+        alert("Módulo ainda em desenvolvimento. Selecione um módulo do Bloco 1 ao 4.");
         return;
     }
 
+    // 2. Prepara o estado do jogo
     isTraining = true;
     score = { correct: 0, wrong: 0 };
     scoreCorrectEl.innerText = '0';
     scoreWrongEl.innerText = '0';
     
-    // Força a posição correta silenciosamente
-    if (currentMode === 'bb-vs-rfi' || currentMode === 'bw-bb') {
-        currentPosition = 'bb';
-        villainSelect.disabled = true;
+    // 3. Força a Posição do Hero internamente de acordo com o módulo escolhido
+    if (currentMode.includes('-vs-rfi')) {
+        // Ex: se o modo for 'sb-vs-rfi', ele extrai o 'sb' e define como posição atual
+        currentPosition = currentMode.split('-')[0]; 
+        villainSelect.disabled = true; // Trava o seletor do vilão durante a sessão
     } else if (currentMode === 'bw-sb') {
         currentPosition = 'sb';
+    } else if (currentMode === 'bw-bb') {
+        currentPosition = 'bb';
     } else {
+        // Módulo RFI clássico: a posição é a que o utilizador escolheu no menu
         currentPosition = posSelect.value;
-        posSelect.disabled = true;
+        posSelect.disabled = true; // Trava o seletor do Hero
     }
     
-    // ... (o resto do código do btnStart mantém-se igual)
-
-    isTraining = true;
-    score = { correct: 0, wrong: 0 };
-    scoreCorrectEl.innerText = '0';
-    scoreWrongEl.innerText = '0';
-    
-    currentPosition = posSelect.value;
-    posSelect.disabled = true;
-    
+    // 4. Troca os botões na Interface
     btnStart.style.display = 'none';
     btnStop.style.display = 'block';
     actionControls.style.display = 'flex';
     
     feedbackDisplay.classList.remove('success', 'error');
-    feedbackText.innerText = `Treino focado em ${currentPosition.toUpperCase()} iniciado!`;
+    feedbackText.innerText = `Sessão de treino iniciada! Boa sorte.`;
     
+    // 5. Dá a primeira mão da sessão
     dealNewHand();
 });
 
