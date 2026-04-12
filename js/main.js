@@ -22,6 +22,7 @@ const actionControls = document.getElementById('action-controls');
 const btnAction1 = document.getElementById('action-fold');
 const btnAction2 = document.getElementById('action-call');
 const btnAction3 = document.getElementById('action-raise');
+const btnAction4 = document.getElementById('action-bet-half'); // NOVO BOTÃO
 
 const slot1 = document.getElementById('slot-1');
 const slot2 = document.getElementById('slot-2');
@@ -64,11 +65,14 @@ function switchMode(mode, clickedElement) {
     navItems.forEach(item => item.classList.remove('active'));
     clickedElement.classList.add('active');
     moduleTitle.innerText = `Treinador: ${clickedElement.innerText}`;
-
+// (Dentro de switchMode, na configuração padrão para todos os modos)
     boardArea.classList.add('hidden');
     configHero.classList.add('hidden');
     configVillain.classList.add('hidden');
     btnAction3.style.display = 'block';
+    if(btnAction4) btnAction4.style.display = 'none'; // Esconde por defeito
+    
+    // ...
     
     btnAction1.innerText = 'FOLD'; btnAction1.className = 'btn-action fold';
     btnAction2.innerText = 'CALL'; btnAction2.className = 'btn-action call';
@@ -95,11 +99,21 @@ function switchMode(mode, clickedElement) {
         configVillain.classList.remove('hidden'); 
         btnAction3.innerText = '3-BET';
     } else if (mode === 'cbet-ip') {
-        moduleDesc.innerText = "Você deu Raise pré-flop e o BB pagou. Flop na mesa. Ação?";
+        moduleDesc.innerText = "Você deu Raise pré-flop e o BB pagou. Flop na mesa. Sizing?";
         boardArea.classList.remove('hidden'); 
+        
         btnAction1.innerText = 'CHECK';
-        btnAction2.innerText = 'BET'; btnAction2.className = 'btn-action raise';
-        btnAction3.style.display = 'none';
+        btnAction1.className = 'btn-action fold'; 
+        
+        btnAction2.innerText = 'BET 33%'; 
+        btnAction2.className = 'btn-action call'; 
+        
+        btnAction4.innerText = 'BET 50%'; // O NOSSO NOVO BOTÃO LARANJA
+        btnAction4.style.display = 'block';
+        
+        btnAction3.innerText = 'BET 75%'; 
+        btnAction3.className = 'btn-action raise'; 
+        btnAction3.style.display = 'block';
     } else if (mode === 'bb-vs-cbet') { 
         moduleDesc.innerText = "O Vilão aposta no Flop. Você no BB. Ação?";
         boardArea.classList.remove('hidden'); 
@@ -130,7 +144,7 @@ function dealNewHand() {
     
     updateCardSlot(slot1, currentHand[0]);
     updateCardSlot(slot2, currentHand[1]);
-    
+    if(btnAction4) btnAction4.disabled = false;
     if (currentMode === 'cbet-ip' || currentMode === 'bb-vs-cbet') {
         currentBoard = [deck[2], deck[3], deck[4]];
         updateCardSlot(flop1, currentBoard[0]);
@@ -167,7 +181,7 @@ function handleAction(actionType) {
     btnAction3.disabled = true;
 
     const result = evaluateAction(currentMode, currentPosition, villainSelect.value, currentNotation, actionType, currentHand, currentBoard);
-    
+    if(btnAction4) btnAction4.disabled = true;
     feedbackDisplay.classList.remove('success', 'error');
     if (result.correct) {
         score.correct++; scoreCorrectEl.innerText = score.correct; feedbackDisplay.classList.add('success');
@@ -234,7 +248,9 @@ btnStop.addEventListener('click', () => {
 btnAction1.addEventListener('click', () => handleAction(btnAction1.innerText.toLowerCase()));
 btnAction2.addEventListener('click', () => handleAction(btnAction2.innerText.toLowerCase()));
 btnAction3.addEventListener('click', () => handleAction(btnAction3.innerText.toLowerCase()));
-
+if(btnAction4) {
+    btnAction4.addEventListener('click', () => handleAction(btnAction4.innerText.toLowerCase()));
+}
 // Botão "Próxima Mão"
 if(btnNextHand) {
     btnNextHand.addEventListener('click', () => {
