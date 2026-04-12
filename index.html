@@ -111,24 +111,42 @@
                     </div>
                 </section>
 
-                <section class="panel results-panel">
-                    <h2>Desempenho</h2>
+        <section class="panel results-panel">
+                    <h2>Desempenho & Análise</h2>
+            
                     <div class="result-box">
-                        <div style="display: flex; justify-content: space-between; width: 100%;">
-                            <div style="text-align: center;">
-                                <span class="result-label">Acertos</span>
-                                <span class="result-value accent" id="score-correct">0</span>
-                            </div>
-                            <div style="text-align: center;">
-                                <span class="result-label">Erros</span>
-                                <span class="result-value danger" id="score-wrong">0</span>
-                            </div>
+                         <div style="display: flex; justify-content: space-between; width: 100%;">
+                         <div style="text-align: center;">
+                            <span class="result-label">Acertos</span>
+                            <span class="result-value accent" id="score-correct">0</span>
                         </div>
+                    <div style="text-align: center;">
+                        <span class="result-label">Erros</span>
+                        <span class="result-value danger" id="score-wrong">0</span>
                     </div>
-                    <div class="feedback-box highlight" id="feedback-display" style="margin-top: 1.5rem; min-height: 100px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 1rem;">
-                        <p id="feedback-text" style="color: var(--text-muted);">Selecione um módulo e inicie a sessão.</p>
-                    </div>
-                </section>
+                </div>
+            </div>
+
+            <div class="feedback-box highlight" id="feedback-display" style="margin-top: 1.5rem; min-height: 100px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 1rem;">
+                <p id="feedback-text" style="color: var(--text-muted);">Selecione um módulo e inicie a sessão.</p>
+            </div>
+
+
+            <button class="btn-secondary" id="btn-run-mc" style="width: 100%; margin-top: 1rem; display: none;">Analisar Mão (Monte Carlo)</button>
+            
+            <button class="btn-primary" id="btn-next-hand" style="width: 100%; margin-top: 0.5rem; display: none;">Próxima Mão &rarr;</button>
+            
+            <div id="mc-results" class="hidden" style="margin-top: 1rem; padding: 1rem; background: var(--bg-input); border-radius: 6px; border: 1px solid var(--border-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span class="result-label">Sua Equity (Vitória):</span>
+                    <span class="result-value accent" id="res-equity" style="font-size: 1.5rem;">--%</span>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">Iterações: <span id="mc-iterations">0</span> / 10.000</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="mc-progress"></div>
+                </div>
+            </div>
+        </section>
             </div>
         </main>
     </div>

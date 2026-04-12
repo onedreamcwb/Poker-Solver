@@ -1,34 +1,34 @@
 // js/engine.js
+// js/engine.js
 import { rfiRanges } from './ranges/rfi.js';
 import { bbVsRfiRanges } from './ranges/bb_vs_rfi.js';
 import { blindWarRanges } from './ranges/blind_war.js';
 import { lateStealsRanges } from './ranges/late_steals.js';
 import { logicCBetIP } from './ranges/cbet_ip.js'; 
+import { logicBBvsCBet } from './ranges/bb_vs_cbet.js'; // Novo
+import { logicBBvsRFIMultiWay } from './ranges/bb_vs_rfi_mw.js'; // Novo
 
-// ---- AVALIADOR UNIVERSAL GTO ----
 export function evaluateAction(mode, heroPos, villainPos, handNotation, action, handCards = [], boardCards = []) {
     switch (mode) {
-        case 'rfi': 
-            return evaluateRFI(heroPos, handNotation, action);
-        case 'bb-vs-rfi': 
-            return evaluateBBvsRFI(villainPos, handNotation, action);
-        case 'bw-sb': 
-            return evaluateBWSB(handNotation, action);
-        case 'bw-bb': 
-            return evaluateBWBB(handNotation, action);
-        case 'sb-vs-rfi': 
-            return evaluateLateSteals('sb', villainPos, handNotation, action);
-        case 'btn-vs-rfi': 
-            return evaluateLateSteals('btn', villainPos, handNotation, action);
+        // --- PRÉ-FLOP ---
+        case 'rfi': return evaluateRFI(heroPos, handNotation, action);
+        case 'bb-vs-rfi': return evaluateBBvsRFI(villainPos, handNotation, action);
+        case 'bw-sb': return evaluateBWSB(handNotation, action);
+        case 'bw-bb': return evaluateBWBB(handNotation, action);
+        case 'sb-vs-rfi': return evaluateLateSteals('sb', villainPos, handNotation, action);
+        case 'btn-vs-rfi': return evaluateLateSteals('btn', villainPos, handNotation, action);
         
-        // Roteamento do C-Bet Pós-Flop (Usa as cartas exatas e o board)
-        case 'cbet-ip': 
-            return logicCBetIP(handCards, boardCards, action); 
+        case 'bb-vs-rfi-mw': return logicBBvsRFIMultiWay(handNotation, action); // Novo
         
-        default: 
-            return { correct: false, msg: `Módulo em desenvolvimento...` };
+        // --- PÓS-FLOP ---
+        case 'cbet-ip': return logicCBetIP(handCards, boardCards, action); 
+        case 'bb-vs-cbet': return logicBBvsCBet(handCards, boardCards, action); // Novo
+        
+        default: return { correct: false, msg: `Módulo em desenvolvimento...` };
     }
 }
+
+// ... (Copie e cole abaixo desta linha todas as outras funções: evaluateRFI, evaluateBBvsRFI, evaluateBWSB, evaluateBWBB, evaluateLateSteals, exatamente como estavam no engine.js da mensagem anterior) ...
 
 // ---- LÓGICA DO MÓDULO 1: RFI ----
 function evaluateRFI(position, handNotation, action) {
